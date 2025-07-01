@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Interactive CPS Substance Abuse Counseling Tracker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.2em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: flex;
+            min-height: 600px;
+        }
+
+        .sidebar {
+            width: 300px;
+            background: #f8f9fa;
+            border-right: 1px solid #e9ecef;
+            padding: 20px;
+        }
+
+        .session-nav {
+            margin-bottom: 30px;
+        }
+
+        .session-nav h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+        }
+
+        .session-btn {
+            display: block;
+            width: 100%;
+            padding: 12px 15px;
+            margin-bottom: 8px;
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: left;
+            font-size: 14px;
+        }
+
+        .session-btn:hover {
+            border-color: #667eea;
+            background: #f8f9ff;
+        }
+
+        .session-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .client-info {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+        }
+
+        .client-info h4 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .client-info input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-bottom: 8px;
+        }
+
+        .content-area {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+        }
+
+        .session-content {
+            display: none;
+        }
+
+        .session-content.active {
+            display: block;
+        }
+
+        .session-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+        }
+
+        .session-header h2 {
+            font-size: 1.8em;
+            margin-bottom: 8px;
+        }
+
+        .segment {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-left: 4px solid #667eea;
+        }
+
+        .segment h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .question-group {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+        }
+
+        .question {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .response-input {
+            width: 100%;
+            min-height: 100px;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: inherit;
+            resize: vertical;
+        }
+
+        .scale-input {
+            margin: 10px 0;
+        }
+
+        .scale-input label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        .scale-slider {
+            width: 100%;
+            margin: 10px 0;
+        }
+
+        .scale-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #666;
+        }
+
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin: 10px 0;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .generate-note-btn {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+            margin: 20px 0;
+        }
+
+        .generate-note-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
+        }
+
+        .progress-note {
+            background: #fff;
+            border: 2px solid #2c3e50;
+            border-radius: 10px;
+            padding: 25px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .progress-note.show {
+            display: block;
+        }
+
+        .note-header {
+            text-align: center;
+            border-bottom: 2px solid #2c3e50;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+
+        .note-section {
+            margin-bottom: 15px;
+        }
+
+        .note-section h4 {
+            color: #2c3e50;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 5px;
+            margin-bottom: 10px;
+        }
+
+        .signature-line {
+            border-top: 1px solid #333;
+            margin-top: 30px;
+            padding-top: 10px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .print-btn {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .time-input {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin: 10px 0;
+        }
+
+        .time-input input {
+            padding: 5px 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .alert {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid #f5c6cb;
+        }
+
+        .success-msg {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid #c3e6cb;
+        }
+
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            .progress-note, .progress-note * {
+                visibility: visible;
+            }
+            .progress-note {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                background: white !important;
+                border: none !important;
+                box-shadow: none !important;
+            }
+            .print-btn {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>CPS Substance Abuse Counseling Tracker</h1>
+            <p>Interactive session tracking with automated progress note generation</p>
+        </div>
+
+        <div class="main-content">
+            <div class="sidebar">
+                <div class="session-nav">
+                    <h3>Select Session</h3>
+                    <button class="session-btn active" onclick="showSession(1)">Week 1: Assessment & Foundation</button>
+                    <button class="session-btn" onclick="showSession(2)">Week 2: Motivation & Goals</button>
+                    <button class="session-btn" onclick="showSession(3)">Week 3: Coping Skills</button>
+                    <button class="session-btn" onclick="showSession(4)">Week 4: Trauma & Grief</button>
+                    <button class="session-btn" onclick="showSession(5)">Week 5: Parenting Skills</button>
+                    <button class="session-btn" onclick="showSession(6)">Week 6: Relapse Prevention</button>
+                    <button class="session-btn" onclick="showSession(7)">Week 7: Support Systems</button>
+                    <button class="session-btn" onclick="showSession(8)">Week 8: Integration & Graduation</button>
+                </div>
+
+                <div class="client-info">
+                    <h4>Client Information</h4>
+                    <input type="text" id="clientName" placeholder="Client Name" value="">
+                    <input type="date" id="sessionDate" value="">
+                    <div class="time-input">
+                        <label>Start:</label>
+                        <input type="time" id="startTime" value="07:00">
+                        <label>End:</label>
+                        <input type="time" id="endTime" value="08:30">
+                    </div>
+                    <input type="text" id="counselorName" placeholder="Counselor Name">
+                </div>
+            </div>
+
+            <div class="content-area">
+                <!-- Session 1 Content -->
+                <div class="session-content active" id="session1">
+                    <div class="session-header">
+                        <h2>Week 1: Assessment & Foundation Building</h2>
+                        <p>Complete comprehensive assessment, establish rapport, understand CPS involvement</p>
+                    </div>
+
+                    <div class="segment">
+                        <h3>Crisis & Safety Assessment</h3>
+                        <div class="question-group">
+                            <div class="question">Substance use in past 24 hours:</div>
+                            <div class="checkbox-group">
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="s1_noUse"> <label for="s1_noUse">No substance use</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="s1_alcohol"> <label for="s1_alcohol">Alcohol</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="s1_drugs"> <label for="s1_drugs">Drugs</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="s1_prescription"> <label for="s1_prescription">Prescription misuse</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="question-group">
+                            <div class="question">Current safety concerns (check all that apply):</div>
+                            <div class="checkbox-group">
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="s1_housing"> <label for="s1_housing">Housing instability</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="s1_withdrawal"> <label for="s1_withdrawal">Withdrawal symptoms</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="s1_suicidal"> <label for="s1_suicidal">Suicidal ideation</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="s1_childSafety"> <label for="s1_childSafety">Child safety concerns</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="segment">
+                        <h3>CPS Involvement & Current Status</h3>
+                        <div class="question-group">
+                            <div class="question">Describe client's understanding of CPS involvement and current case status:</div>
+                            <textarea class="response-input" id="s1_cpsStatus" placeholder="Client's perspective on CPS case, custody arrangements, court requirements..."></textarea>
+                        </div>
+
+                        <div class="question-group">
+                            <div class="question">Client's emotional response to child placement:</div>
+                            <div class="scale-input">
+                                <label>Distress Level (1-10):</label>
+                                <input type="range" class="scale-slider" min="1" max="10" value="5" id="s1_distressLevel">
+                                <div class="scale-labels">
+                                    <span>1 - Minimal</span>
+                                    <span>5 - Moderate</span>
+                                    <span>10 - Severe</span>
+                                </div>
+                                <output id="s1_distressOutput">5</output>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="segment">
+                        <h3>Substance Use Assessment</h3>
+                        <div class="question-group">
+                            <div class="question">Primary substances used and frequency:</div>
+                            <textarea class="response-input" id="s1_substanceHistory" placeholder="Types of substances, frequency of use, last use details, impact on parenting..."></textarea>
+                        </div>
+
+                        <div class="question-group">
+                            <div class="question">Readiness for change assessment:</div>
+                            <div class="scale-input">
+                                <label>Motivation to Change (1-10):</label>
+                                <input type="range" class="scale-slider" min="1" max="10" value="5" id="s1_motivation">
+                                <div class="scale-labels">
+                                    <span>1 - Not ready</span>
+                                    <span>5 - Ambivalent</span>
+                                    <span>10 - Very ready</span>
+                                </div>
+                                <output id="s1_motivationOutput">5</output>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="segment">
+                        <h3>Goals & Treatment Planning</h3>
+                        <div class="question-group">
+                            <div class="question">Client's stated goals for treatment:</div>
+                            <textarea class="response-input" id="s1_clientGoals" placeholder="What client wants to achieve, reasons for change, family goals..."></textarea>
+                        </div>
+
+                        <div class="question-group">
+                            <div class="question">Homework assigned:</div>
+                            <div class="checkbox-group">
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="s1_hw1"> <label for="s1_hw1">Daily substance use tracking</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="s1_hw2"> <label for="s1_hw2">Trigger identification</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="s1_hw3"> <label for="s1_hw3">Letter to children (recovery goals)</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="s1_hw4"> <label for="s1_hw4">Gather CPS documents</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button class="generate-note-btn" onclick="generateProgressNote(1)">Generate Progress Note</button>
+                </div>
+
+                <!-- Session 2 Content -->
+                <div class="session-content" id="session2">
+                    <div class="session-header">
+                        <h2>Week 2: Motivation Building & Goal Setting</h2>
+                        <p>Build motivation using MI techniques, establish concrete goals, address ambivalence</p>
+                    </div>
+
+                    <div class="segment">
+                        <h3>Homework Review & Progress</h3>
+                        <div class="question-group">
+                            <div class="question">Substance use since last session:</div>
+                            <textarea class="response-input" id="s2_substanceUse" placeholder="Any substance use, cravings, close calls, withdrawal symptoms..."></textarea>
+                        </div>
+
+                        <div class="question-group">
+                            <div class="question">Homework completion and insights:</div>
+                            <textarea class="response-input" id="s2_homeworkReview" placeholder="Tracking results, triggers identified, barriers to completion..."></textarea>
+                        </div>
+                    </div>
+
+                    <div class="segment">
+                        <h3>Motivational Enhancement</h3>
+                        <div class="question-group">
+                            <div class="question">Decisional balance - pros and cons of change:</div>
+                            <textarea class="response-input" id="s2_decisionalBalance" placeholder="Benefits of stopping vs continuing use, costs of each option..."></textarea>
+                        </div>
+
+                        <div class="question-group">
+                            <div class="question">Importance and confidence scaling:</div>
+                            <div class="scale-input">
+                                <label>Importance of Change (1-10):</label>
+                                <input type="range" class="scale-slider" min="1" max="10" value="5" id="s2_importance">
+                                <output id="s2_importanceOutput">5</output>
+                            </div>
+                            <div class="scale-input">
+                                <label>Confidence in Ability to Change (1-10):</label>
+                                <input type="range" class="scale-slider" min="1" max="10" value="5" id="s2_confidence">
+                                <output id="s2_confidenceOutput">5</output>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="segment">
+                        <h3>SMART Goal Setting</h3>
+                        <div class="question-group">
+                            <div class="question">Finalized treatment goals (SMART format):</div>
+                            <textarea class="response-input" id="s2_smartGoals" placeholder="Specific, Measurable, Achievable, Relevant, Time-bound goals..."></textarea>
+                        </div>
+
+                        <div class="question-group">
+                            <div class="question">Recovery vision and motivation:</div>
+                            <textarea class="response-input" id="s2_recoveryVision" placeholder="Client's vision of life in recovery, relationship with children..."></textarea>
+                        </div>
+                    </div>
+
+                    <button class="generate-note-btn" onclick="generateProgressNote(2)">Generate Progress Note</button>
+                </div>
+
+                <!-- Session 3 Content -->
+                <div class="session-content" id="session3">
+                    <div class="session-header">
+                        <h2>Week 3: Coping Skills & Relapse Prevention Basics</h2>
+                        <p>Develop foundational coping skills, introduce relapse prevention concepts</p>
+                    </div>
+
+                    <div class="segment">
+                        <h3>Skill Practice Review</h3>
+                        <div class="question-group">
+                            <div class="question">Coping skills attempted this week:</div>
+                            <textarea class="response-input" id="s3_copingAttempts" placeholder="Which skills tried, effectiveness, barriers encountered..."></textarea>
+                        </div>
+
+                        <div class="question-group">
+                            <div class="question">High-risk situations encountered:</div>
+                            <textarea class="response-input" id="s3_triggers" placeholder="Triggers faced, craving intensity, responses used..."></textarea>
+                        </div>
+                    </div>
+
+                    <div class="segment">
+                        <h3>Coping Skills Training</h3>
+                        <div class="question-group">
+                            <div class="question">Skills learned and practiced in session:</div>
+                            <div class="checkbox-group">
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="s3_breathing"> <label for="s3_breathing">Deep breathing techniques</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="s3_pmr"> <label for="s3_pmr">Progressive muscle relaxation</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="s3_mindfulness"> <label for="s3_mindfulness">Mindfulness exercises</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="s3_pass"> <label for="s3_pass">PASS technique for cravings</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="question-group">
+                            <div class="question">Client's response to skill training:</div>
+                            <textarea class="response-input" id="s3_skillResponse" placeholder="Engagement level, comfort with techniques, preferred skills..."></textarea>
+                        </div>
+                    </div>
+
+                    <div class="segment">
+                        <h3>Relapse Prevention Education</h3>
+                        <div class="question-group">
+                            <div class="question">Client's understanding of relapse process:</div>
+                            <textarea class="response-input" id="s3_relapseUnderstanding" placeholder="Emotional vs mental vs physical relapse, warning signs recognized..."></textarea>
+                        </div>
+
+                        <div class="question-group">
+                            <div class="question">Personal high-risk situations identified:</div>
+                            <textarea class="response-input" id="s3_personalRisks" placeholder="HALT situations, parenting stress triggers, specific vulnerabilities..."></textarea>
+                        </div>
+                    </div>
+
+                    <button class="generate-note-btn" onclick="generateProgressNote(3)">Generate Progress Note</button>
+                </div>
+
+                <!-- Session 4 Content -->
+                <div class="session-content" id="session4">
+                    <div class="session-header">
+                        <h2>Week 4: Trauma, Grief & Underlying Issues</h2>
+                        <p>Address trauma and grief related to child placement and substance use consequences</p>
+                    </div>
+
+                    <div class="segment">
+                        <h3>Emotional State Assessment</h3>
+                        <div class="question-group">
+                            <div class="question">Trauma symptoms present:</div>
+                            <div class="checkbox-group">
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="s4_hypervigilance"> <label for="s4_hypervigilance">Hypervigilance</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="s4_nightmares"> <label for="s4_nightmares">Nightmares/flashbacks</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="s4_avoidance"> <label for="s4_avoidance">Avoidance behaviors</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="s4_numbing"> <label for="s4_numbing">Emotional numbing</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="question-group">
+                            <div class="question">Grief and loss processing:</div>
+                            <textarea class="response-input" id="s4_grief" placeholder="Losses identified, grief stage, impact on functioning..."></textarea>
+                        </div>
+                    </div>
+
+                    <div class="segment">
+                        <h3>Trauma-Informed Coping</h3>
+                        <div class="question-group">
+                            <div class="question">Grounding techniques practiced:</div>
+                            <textarea class="response-input" id="s4_grounding" placeholder="5-4-3-2-1 technique, body-based grounding, effectiveness..."></textarea>
+                        </div>
+
+                        <div class="question-group">
+                            <div class="question">Self-compassion and shame work:</div>
+                            <textarea class="response-input" id="s4_selfCompassion" placeholder="Shame vs guilt work, self-compassion exercises, progress..."></textarea>
+                        </div>
+                    </div>
+
+                    <button class="generate-note-btn" onclick="generateProgressNote(4)">Generate Progress Note</button>
+                </div>
+
+                <!-- Session 5 Content -->
+                <div class="session-content" id="session5">
+                    <div class="session-header">
+                        <h2>Week 5: Rebuilding Parenting Skills & Family Relationships</h2>
+                        <p>Assess parenting strengths, develop healthy strategies, address guilt and shame</p>
+                    </div>
+
+                    <div class="segment">
+                        <h3>Parenting Assessment</h3>
+                        <div class="question-group">
+                            <div class="question">Current parenting challenges during visits:</div>
+                            <textarea class="response-input" id="s5_parentingChallenges" placeholder="Visitation difficulties, children's reactions, emotional challenges..."></textarea>
+                        </div>
+
+                        <div class="question-group">
+                            <div class="question">Parenting strengths identified:</div>
+                            <textarea class="response-input" id="s5_parentingStrengths" placeholder="Positive parenting qualities, skills already present..."></textarea>
+                        </div>
+                    </div>
+
+                    <div class="segment">
+                        <h3>Parenting Skills Training</h3>
+                        <div class="question-group">
+                            <div class="question">Skills practiced in session:</div>
+                            <div class="checkbox-group">
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="s5_activeListening"> <label for="s5_activeListening">Active listening</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="s5_emotionalReg"> <label for="s5_emotionalReg">Emotional regulation modeling</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="s5_boundaries"> <label for="s5_boundaries">Setting healthy boundaries</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="s5_discipline"> <label for="s5_discipline">Recovery-focused discipline</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="question-group">
+                            <div class="question">Client's response to parenting skill training:</div>
+                            <textarea class="response-input" id="s5_skillResponse" placeholder="Engagement, comfort level, insights gained..."></textarea>
+                        </div>
+                    </div>
+
+                    <button class="generate-note-btn" onclick="generateProgressNote(5)">Generate Progress Note</button>
+                </div>
+
+                <!-- Session 6 Content -->
+                <div class="session-content" id="session6">
+                    <div class="session-header">
+                        <h2>Week 6: Relapse Prevention & Long-term Planning</h2>
+                        <p>Develop comprehensive relapse prevention plan and long-term recovery strategies</p>
+                    </div>
+
+                    <div class="segment">
+                        <h3>Warning Signs Identification</h3>
+                        <div class="question-group">
+                            <div class="question">Personal warning signs identified:</div>
+                            <textarea class="response-input" id="s6_warningSignes" placeholder="Emotional, behavioral, and thinking changes that precede relapse risk..."></textarea>
+                        </div>
+
+                        <div class="question-group">
+                            <div class="question">High-risk situations for this client:</div>
+                            <textarea class="response-input" id="s6_highRisk" placeholder="Specific triggers, situations, emotions that increase relapse risk..."></textarea>
+                        </div>
+                    </div>
+
+                    <div class="segment">
+                        <h3>Relapse Prevention Plan</h3>
+                        <div class="question-group">
+                            <div class="question">Prevention strategies developed:</div>
+                            <textarea class="response-input" id="s6_prevention" placeholder="Daily maintenance activities, coping strategies, support system plans..."></textarea>
+                        </div>
+
+                        <div class="question-group">
+                            <div class="question">Crisis intervention plan:</div>
+                            <textarea class="response-input" id="s6_crisis" placeholder="Emergency contacts, immediate actions, professional support..."></textarea>
+                        </div>
+                    </div>
+
+                    <button class="generate-note-btn" onclick="generateProgressNote(6)">Generate Progress Note
